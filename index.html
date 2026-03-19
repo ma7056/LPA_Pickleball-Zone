@@ -269,7 +269,7 @@
     function popDepositModal() {
         Swal.fire({
             title: '點數儲值',
-            html: '<input id="dep-id" class="swal2-input" placeholder="ID末3碼" type="number"><input id="dep-amt" class="swal2-input" placeholder="儲值金額" type="number">',
+            html: '<input id="dep-id" class="swal2-input" placeholder="ID末3碼" type="number"><input id="dep-amt" class="swal2-input" placeholder="儲值點數" type="number">',
             showCancelButton: true,
             confirmButtonText: '確認儲值',
             preConfirm: () => ({ id: document.getElementById('dep-id').value, amt: document.getElementById('dep-amt').value })
