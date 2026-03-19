@@ -9,35 +9,31 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
-    <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/zh-tw.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
     <style>
-        /* --- 整合 include_css --- */
-        :root { --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); --glass-bg: rgba(255, 255, 255, 0.95); }
-        body { background-color: #f4f7f6; font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; color: #2d3436; }
-        .app-container { max-width: 500px; margin: 0 auto; min-height: 100vh; background: #fff; position: relative; overflow-x: hidden; }
+        :root { --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        body { background-color: #f4f7f6; font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; color: #2d3436; padding-bottom: constant(safe-area-inset-bottom); padding-bottom: env(safe-area-inset-bottom); }
+        .app-container { max-width: 500px; margin: 0 auto; min-height: 100vh; background: #fff; position: relative; padding-bottom: 80px; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
         .loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
-        .portal-header { background: var(--primary-gradient); color: white; padding: 40px 20px; border-radius: 0 0 30px 30px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3); }
-        .feature-card { background: white; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s; border: 1px solid rgba(0,0,0,0.03); height: 100%; }
+        .portal-header { background: var(--primary-gradient); color: white; padding: 40px 20px; border-radius: 0 0 30px 30px; text-align: center; margin-bottom: 25px; }
+        .feature-card { background: white; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.05); cursor: pointer; border: 1px solid rgba(0,0,0,0.03); height: 100%; transition: transform 0.2s; }
         .feature-card:active { transform: scale(0.95); }
         .icon-box { width: 50px; height: 50px; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 24px; }
         
-        /* 會員中心樣式 */
-        .user-card { background: var(--primary-gradient); color: white; border-radius: 25px; padding: 25px; margin-bottom: 20px; position: relative; overflow: hidden; }
-        .rank-badge { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; }
+        /* 會員卡片與進度條 */
+        .user-card { background: var(--primary-gradient); color: white; border-radius: 25px; padding: 25px; position: relative; overflow: hidden; }
         .progress-container { background: rgba(255,255,255,0.2); height: 8px; border-radius: 4px; margin: 15px 0; }
         .progress-fill { background: #fff; height: 100%; border-radius: 4px; transition: width 1s ease-in-out; }
 
-        /* 日曆與名單樣式 */
-        .fc-daygrid-day-number { text-decoration: none !important; color: #333; font-weight: 500; }
-        .ev-wed { background-color: rgba(102, 126, 234, 0.08) !important; }
-        .ev-thu { background-color: rgba(118, 75, 162, 0.08) !important; }
-        .ev-sun { background-color: rgba(255, 193, 7, 0.08) !important; }
-        .event-item { border-radius: 15px; padding: 15px; margin-bottom: 12px; border-left: 5px solid #ddd; background: #fff; box-shadow: 0 3px 10px rgba(0,0,0,0.03); cursor: pointer; }
+        /* 日曆樣式修正 */
+        .fc { background: white; padding: 10px; border-radius: 15px; }
+        .fc-daygrid-day-number { text-decoration: none !important; color: #333; }
+        .event-item { border-radius: 15px; padding: 15px; margin-bottom: 12px; border-left: 5px solid #667eea; background: #fff; box-shadow: 0 3px 10px rgba(0,0,0,0.03); cursor: pointer; }
+        .list-wed { border-left-color: #667eea; } .list-thu { border-left-color: #764ba2; } .list-sun { border-left-color: #ffc107; }
         .name-tag { display: inline-block; padding: 4px 10px; margin: 3px; border-radius: 8px; background: #f1f2f6; font-size: 0.85rem; border: 1px solid #eee; }
         .is-signed { background: #e3fcef !important; color: #00b894 !important; border-color: #55efc4 !important; }
     </style>
@@ -73,7 +69,7 @@
                         <div class="icon-box bg-dark text-white me-3 mb-0"><i class="bi bi-shield-lock"></i></div>
                         <div class="text-start">
                             <h6 class="fw-bold mb-0">管理端登入</h6>
-                            <p class="text-muted small mb-0">簽到、場次設定與儲值管理</p>
+                            <p class="text-muted small mb-0">簽到、場次與儲值管理</p>
                         </div>
                     </div>
                 </div>
@@ -95,22 +91,18 @@
     <div id="admin-ui" class="app-container" style="display:none;">
         <div class="p-3 d-flex justify-content-between align-items-center bg-white border-bottom sticky-top">
             <h6 id="admin-title" class="fw-bold m-0">簽到管理</h6>
-            <div class="d-flex gap-1">
-                <button id="mgr-icon" class="btn btn-sm btn-warning rounded-pill" style="display:none;" onclick="openManagement()"><i class="bi bi-gear"></i></button>
+            <div class="d-flex gap-2">
+                <button id="mgr-icon" class="btn btn-sm btn-warning rounded-circle" style="display:none;" onclick="openManagement()"><i class="bi bi-gear"></i></button>
                 <button class="btn btn-sm btn-outline-danger rounded-pill" onclick="switchUI('portal-ui', 'admin-ui')">退出</button>
             </div>
         </div>
         <div id="admin-date-nav" class="d-flex overflow-auto p-2 bg-light border-bottom"></div>
         <div class="p-3">
-            <button class="btn btn-primary w-100 mb-3 fw-bold shadow-sm" onclick="popQuickAdd()">➕ 臨時手動報名</button>
-            <div id="admin-content"></div>
-        </div>
-        <div id="deposit-box" class="fixed-bottom mx-auto bg-white border-top p-3 shadow-lg" style="max-width:500px; display:none;">
-            <div class="input-group">
-                <input type="number" id="depId" class="form-control" placeholder="ID末3碼">
-                <input type="number" id="depAmt" class="form-control" placeholder="金額">
-                <button class="btn btn-danger px-4" onclick="doDeposit()">儲值</button>
+            <div class="row g-2 mb-3">
+                <div class="col-6"><button class="btn btn-primary w-100 fw-bold shadow-sm" onclick="popQuickAdd()">➕ 臨時報名</button></div>
+                <div class="col-6"><button id="btn-deposit-trigger" class="btn btn-danger w-100 fw-bold shadow-sm" style="display:none;" onclick="popDepositModal()">💰 點數儲值</button></div>
             </div>
+            <div id="admin-content"></div>
         </div>
     </div>
 
@@ -122,12 +114,11 @@
         <div id="user-card-content"></div>
         <div class="mt-4 p-3 border rounded-3 bg-light">
             <h6 class="fw-bold small mb-3"><i class="bi bi-clock-history me-2"></i>近期活動記錄</h6>
-            <div id="user-history" class="small text-muted">載入中...</div>
+            <div id="user-history" class="small text-muted">資料讀取中...</div>
         </div>
     </div>
 
 <script>
-    // --- 核心配置 ---
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwdG-nFQi8js3v2t6yfu3IXHA4pEjKMeNFtTQZy0UbKpztb_c_U1Bgaj06mKvZQnOWF/exec";
     let evData = [];
     let cal = null;
@@ -135,7 +126,7 @@
     let currentAdminDate = new Date().toISOString().split('T')[0];
     const wk = ["日", "一", "二", "三", "四", "五", "六"];
 
-    // --- 通訊橋接器 (關鍵：讓 GitHub 能動) ---
+    // 通訊橋接器
     async function callGAS(func, args = []) {
         try {
             const response = await fetch(GAS_URL, {
@@ -144,35 +135,34 @@
             });
             return await response.json();
         } catch (e) {
-            console.error(e);
-            Swal.fire('連線失敗', '無法連接到後端伺服器', 'error');
+            Swal.fire('連線失敗', '請確認 Code.gs 是否已更新 doPost 函數', 'error');
             return { success: false, msg: '連線錯誤' };
         }
     }
 
-    // --- 頁面轉場邏輯 ---
+    // 頁面切換
     function switchUI(show, hide) {
         document.getElementById(hide).style.display = 'none';
         document.getElementById(show).style.display = 'block';
         window.scrollTo(0, 0);
+        if (show === 'main-ui' && cal) {
+            setTimeout(() => { cal.updateSize(); refreshColorsAndList(); }, 200);
+        }
     }
 
-    // --- 初始化 ---
-    window.onload = () => {
-        // 先抓資料，抓完後顯示首頁
-        callGAS('fetchInitialData').then(res => {
-            evData = res.events || [];
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('portal-ui').style.display = 'block';
-        });
+    // 初始化
+    window.onload = async () => {
+        const res = await callGAS('fetchInitialData');
+        evData = res.events || [];
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('portal-ui').style.display = 'block';
     };
 
-    // --- 預約系統 (js_booking 邏輯) ---
+    // --- 預約邏輯 ---
     function goToBooking() {
         switchUI('main-ui', 'portal-ui');
         if (!cal) {
-            const calendarEl = document.getElementById('calendar');
-            cal = new FullCalendar.Calendar(calendarEl, {
+            cal = new FullCalendar.Calendar(document.getElementById('calendar'), {
                 initialView: 'dayGridMonth',
                 locale: 'zh-tw',
                 headerToolbar: { left: 'title', center: '', right: 'prev,next' },
@@ -181,41 +171,36 @@
                     const idx = evData.findIndex(e => e.start === info.dateStr);
                     if (idx !== -1) popDetail(idx);
                 },
-                dayCellDidMount: (i) => renderDay(i.el, i.date),
+                dayCellDidMount: (i) => {
+                    const dStr = i.date.toISOString().split('T')[0];
+                    const e = evData.find(x => x.start === dStr);
+                    if (e) {
+                        const d = i.date.getDay();
+                        if (d === 3) i.el.classList.add('ev-wed');
+                        else if (d === 4) i.el.classList.add('ev-thu');
+                        else if (d === 0) i.el.classList.add('ev-sun');
+                    }
+                },
                 datesSet: () => refreshColorsAndList()
             });
             cal.render();
-        } else {
-            setTimeout(() => { cal.updateSize(); refreshColorsAndList(); }, 200);
-        }
-    }
-
-    function renderDay(el, date) {
-        const dStr = date.getFullYear() + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + ("0" + date.getDate()).slice(-2);
-        const e = evData.find(x => x.start === dStr);
-        if (e) {
-            const d = date.getDay();
-            if (d === 3) el.classList.add('ev-wed');
-            else if (d === 4) el.classList.add('ev-thu');
-            else if (d === 0) el.classList.add('ev-sun');
-            if (e.isOpen && e.extendedProps.mainList.length >= 8) el.classList.add('is-ready');
         }
     }
 
     function refreshColorsAndList() {
         const cur = cal.getDate(), y = cur.getFullYear(), m = cur.getMonth();
         const monthEvents = evData.filter(e => {
-            const ed = new Date(e.start.replace(/-/g, '/'));
+            const ed = new Date(e.start);
             return ed.getFullYear() === y && ed.getMonth() === m;
         }).sort((a, b) => new Date(a.start) - new Date(b.start));
 
         let html = "";
         monthEvents.forEach(e => {
             const dW = new Date(e.start).getDay();
-            const color = dW === 3 ? 'list-wed' : (dW === 4 ? 'list-thu' : (dW === 0 ? 'list-sun' : ''));
+            const colorClass = dW === 3 ? 'list-wed' : (dW === 4 ? 'list-thu' : (dW === 0 ? 'list-sun' : ''));
             const total = e.extendedProps.mainList.length + e.extendedProps.waitList.length;
             html += `
-                <div class="event-item ${color}" onclick="popDetail(${evData.indexOf(e)})">
+                <div class="event-item ${colorClass}" onclick="popDetail(${evData.indexOf(e)})">
                     <div class="d-flex justify-content-between align-items-center">
                         <div><small>${e.start} (週${wk[dW]})</small><div class="fw-bold">${e.title}</div></div>
                         <div class="text-end"><span class="badge ${e.isOpen?'bg-primary':'bg-info'}">${e.isOpen?total+'人':'僅供資訊'}</span></div>
@@ -225,37 +210,38 @@
         document.getElementById('list-box').innerHTML = html || "<p class='text-center text-muted p-5'>本月尚無場次</p>";
     }
 
-    // --- 會員中心 (module_user_center 邏輯) ---
+    // --- 會員中心 (加回帳密機制) ---
     async function popMemberCenter() {
-        const { value: id } = await Swal.fire({ title: '會員查詢', input: 'number', inputPlaceholder: '請輸入 ID 末 3 碼', showCancelButton: true });
-        if (!id) return;
-        
-        Swal.showLoading();
-        const res = await callGAS('runUserLogin', [id]);
-        if (!res.success) return Swal.fire('錯誤', res.msg, 'error');
+        const { value: formValues } = await Swal.fire({
+            title: '會員登入',
+            html: '<input id="sw-id" class="swal2-input" placeholder="ID末3碼" type="number"><input id="sw-pw" class="swal2-input" placeholder="密碼(手機末3碼)" type="password">',
+            preConfirm: () => [document.getElementById('sw-id').value, document.getElementById('sw-pw').value]
+        });
 
-        const p = res.data;
-        // 等級計算邏輯
-        const percent = Math.min(100, Math.round((p.attendance / (res.topAttendance || 100)) * 100));
-        
-        document.getElementById('user-card-content').innerHTML = `
-            <div class="user-card shadow">
-                <div class="rank-badge">${p.rankName || '一般會員'}</div>
-                <h3 class="fw-bold mb-1">${p.name}</h3>
-                <div class="small opacity-75">ID: 115${id}</div>
-                <div class="progress-container"><div class="progress-fill" style="width: ${percent}%"></div></div>
-                <div class="d-flex justify-content-between align-items-end">
-                    <div><small class="opacity-75">儲值點數</small><h2 class="fw-bold m-0">${p.balance}</h2></div>
-                    <div id="qrcode" class="bg-white p-1 rounded"></div>
-                </div>
-            </div>`;
-        
-        switchUI('user-center-ui', 'portal-ui');
-        new QRCode(document.getElementById("qrcode"), { text: `MEMBER:${id}`, width: 60, height: 60 });
-        document.getElementById('user-history').innerText = "近期無參加紀錄"; // 這裡可再接 API
+        if (formValues) {
+            Swal.showLoading();
+            const res = await callGAS('runUserLogin', [formValues[0], formValues[1]]);
+            if (!res.success) return Swal.fire('登入失敗', res.msg, 'error');
+
+            const p = res.data;
+            const percent = Math.min(100, Math.round((p.attendance / (res.topAttendance || 100)) * 100));
+            document.getElementById('user-card-content').innerHTML = `
+                <div class="user-card shadow">
+                    <div class="badge bg-white text-dark position-absolute top-0 end-0 m-3">${p.rankName || '一般會員'}</div>
+                    <h3 class="fw-bold mb-1">${p.name}</h3>
+                    <div class="small opacity-75 mb-3">ID: 115${formValues[0]}</div>
+                    <div class="progress-container"><div class="progress-fill" style="width: ${percent}%"></div></div>
+                    <div class="d-flex justify-content-between align-items-end">
+                        <div><small class="opacity-75">儲值點數</small><h2 class="fw-bold m-0">${p.balance}</h2></div>
+                        <div id="qrcode" class="bg-white p-1 rounded shadow-sm"></div>
+                    </div>
+                </div>`;
+            switchUI('user-center-ui', 'portal-ui');
+            new QRCode(document.getElementById("qrcode"), { text: `MEMBER:${formValues[0]}`, width: 70, height: 70 });
+        }
     }
 
-    // --- 管理員中心 (js_admin / module_checkin 邏輯) ---
+    // --- 管理端邏輯 (含彈窗儲值) ---
     async function popAdminLogin() {
         const { value: formValues } = await Swal.fire({
             title: '管理員認證',
@@ -269,7 +255,7 @@
             if (res.success) {
                 userRole = res.role;
                 document.getElementById('admin-title').innerText = `簽到中心 (${userRole === 'ADMIN' ? '總管' : '工作人員'})`;
-                document.getElementById('deposit-box').style.display = userRole === 'ADMIN' ? 'block' : 'none';
+                document.getElementById('btn-deposit-trigger').style.display = userRole === 'ADMIN' ? 'block' : 'none';
                 document.getElementById('mgr-icon').style.display = userRole === 'ADMIN' ? 'block' : 'none';
                 switchUI('admin-ui', 'portal-ui');
                 renderAdminDateNav();
@@ -278,6 +264,114 @@
                 Swal.fire('驗證失敗', res.msg, 'error');
             }
         }
+    }
+
+    function popDepositModal() {
+        Swal.fire({
+            title: '點數儲值',
+            html: '<input id="dep-id" class="swal2-input" placeholder="ID末3碼" type="number"><input id="dep-amt" class="swal2-input" placeholder="儲值金額" type="number">',
+            showCancelButton: true,
+            confirmButtonText: '確認儲值',
+            preConfirm: () => ({ id: document.getElementById('dep-id').value, amt: document.getElementById('dep-amt').value })
+        }).then(async (r) => {
+            if (r.isConfirmed) {
+                Swal.showLoading();
+                const res = await callGAS('adminDeposit', [r.value.id, r.value.amt, userRole]);
+                Swal.fire(res.success ? '成功' : '失敗', res.msg, res.success ? 'success' : 'error');
+                if (res.success) loadAdminContent();
+            }
+        });
+    }
+
+    async function loadAdminContent() {
+        const container = document.getElementById('admin-content');
+        container.innerHTML = '<p class="text-center p-5 text-muted">讀取名單中...</p>';
+        const res = await callGAS('getCheckInList', [currentAdminDate]);
+        if (!res.success) {
+            container.innerHTML = `<p class="text-center p-5 text-muted">${res.msg || '本日無活動'}</p>`;
+            return;
+        }
+        let html = "";
+        res.main.forEach(p => {
+            const isS = res.signed.includes(p.name);
+            html += `
+                <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                    <div><span class="fw-bold">${p.id.toString().slice(-3)} ${p.name}</span><br><small class="text-muted">點數: ${p.balance}</small></div>
+                    <button class="btn btn-sm ${isS ? 'btn-success' : 'btn-primary'} rounded-pill px-3" ${isS ? 'disabled' : ''} onclick="doSign(this, '${p.name}')">
+                        ${isS ? '已簽到' : '簽到'}
+                    </button>
+                </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    async function doSign(btn, name) {
+        btn.disabled = true;
+        const res = await callGAS('submitCheckIn', [currentAdminDate, name, 1, "", false]);
+        if (res.success) {
+            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: '簽到成功', showConfirmButton: false, timer: 1500 });
+            loadAdminContent();
+        } else {
+            btn.disabled = false;
+            Swal.fire('簽到失敗', res.msg, 'error');
+        }
+    }
+
+    async function popQuickAdd() {
+        const { value: id } = await Swal.fire({ title: '臨時報名', input: 'number', inputPlaceholder: '請輸入 ID 末 3 碼', showCancelButton: true });
+        if (id) {
+            Swal.showLoading();
+            const res = await callGAS('quickAddAndSign', [currentAdminDate, id]);
+            Swal.fire(res.success ? '成功' : '失敗', res.msg, res.success ? 'success' : 'error');
+            if (res.success) loadAdminContent();
+        }
+    }
+
+    function openManagement() {
+        Swal.fire({
+            title: '場次管理',
+            text: '系統偵測到您為管理員，是否前往設定介面？',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '前往設定'
+        }).then(r => {
+            if(r.isConfirmed) {
+                // 這裡可以連往您的管理頁面或顯示隱藏的設定 UI
+                Swal.fire('提示', '請回到電腦端 GAS 操作詳細場次設定。', 'info');
+            }
+        });
+    }
+
+    async function popDetail(idx) {
+        const e = evData[idx];
+        const tags = (list) => list.length ? list.map(p => `<span class="name-tag ${p.isSigned?'is-signed':''}">${p.name}</span>`).join('') : '無';
+        Swal.fire({
+            title: e.title,
+            width: '95%',
+            html: `
+                <div class="text-start small">
+                    <p class="mb-2"><i class="bi bi-clock me-2"></i>${e.start}</p>
+                    <div class="text-success fw-bold">🏆 正取 (${e.extendedProps.mainList.length})</div>
+                    <div class="mb-3">${tags(e.extendedProps.mainList)}</div>
+                    ${e.isOpen ? `
+                        <hr>
+                        <input id="regId" class="form-control text-center" placeholder="輸入 ID 末 3 碼報名" type="number">
+                    ` : '<div class="alert alert-warning py-1 text-center">本場次不開放線上預約</div>'}
+                </div>`,
+            showConfirmButton: e.isOpen,
+            confirmButtonText: '確定報名',
+            showCancelButton: true
+        }).then(async (r) => {
+            if (r.isConfirmed) {
+                const id = document.getElementById('regId').value;
+                if (!id) return;
+                Swal.showLoading();
+                const res = await callGAS('processRegistration', [e.start, [id], 'REGISTER', []]);
+                Swal.fire('訊息', res.msg || res, 'info').then(() => {
+                    callGAS('fetchInitialData').then(d => { evData = d.events; refreshColorsAndList(); });
+                });
+            }
+        });
     }
 
     function renderAdminDateNav() {
@@ -289,114 +383,10 @@
             let div = document.createElement('div');
             div.className = `p-2 me-2 rounded-3 text-center ${dS === currentAdminDate ? 'bg-primary text-white shadow' : 'bg-white'}`;
             div.style.minWidth = "65px";
-            div.innerHTML = `<div class="small">${d.getMonth() + 1}/${d.getDate()}</div><div class="fw-bold">週${wk[d.getDay()]}</div>`;
+            div.innerHTML = `<div class="small">${d.getMonth()+1}/${d.getDate()}</div><div class="fw-bold">週${wk[d.getDay()]}</div>`;
             div.onclick = () => { currentAdminDate = dS; renderAdminDateNav(); loadAdminContent(); };
             nav.appendChild(div);
         }
-    }
-
-    async function loadAdminContent() {
-        document.getElementById('admin-content').innerHTML = '<p class="text-center p-5 text-muted">讀取名單中...</p>';
-        const res = await callGAS('getCheckInList', [currentAdminDate]);
-        if (!res.success) {
-            document.getElementById('admin-content').innerHTML = `<p class="text-center p-5 text-muted">${res.msg || '本日無活動'}</p>`;
-            return;
-        }
-
-        let html = "";
-        res.main.forEach(p => {
-            const isS = res.signed.includes(p.name);
-            html += `
-                <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
-                    <div><span class="fw-bold">${p.id.toString().slice(-3)} ${p.name}</span><br><small class="text-muted">餘額: ${p.balance}</small></div>
-                    <button class="btn btn-sm ${isS ? 'btn-success' : 'btn-primary'} rounded-pill px-3" ${isS ? 'disabled' : ''} onclick="doSign(this, '${p.name}')">
-                        ${isS ? '已簽到' : '簽到'}
-                    </button>
-                </div>`;
-        });
-        document.getElementById('admin-content').innerHTML = html || "<p class='text-center p-5'>名單為空</p>";
-    }
-
-    async function doSign(btn, name) {
-        btn.disabled = true;
-        const res = await callGAS('submitCheckIn', [currentAdminDate, name, 1, "", false]);
-        if (res.success) {
-            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: '簽到成功', showConfirmButton: false, timer: 1500 });
-            loadAdminContent();
-        } else {
-            btn.disabled = false;
-            Swal.fire('失敗', res.msg, 'error');
-        }
-    }
-
-    async function doDeposit() {
-        const id = document.getElementById('depId').value;
-        const amt = document.getElementById('depAmt').value;
-        if (!id || !amt) return Swal.fire('請填寫完整', '', 'warning');
-        
-        Swal.showLoading();
-        const res = await callGAS('adminDeposit', [id, amt, userRole]);
-        Swal.fire(res.success ? '儲值成功' : '儲值失敗', res.msg, res.success ? 'success' : 'error');
-        if (res.success) {
-            document.getElementById('depId').value = '';
-            document.getElementById('depAmt').value = '';
-            loadAdminContent();
-        }
-    }
-
-    async function popQuickAdd() {
-        const { value: id } = await Swal.fire({ title: '手動報名', input: 'number', inputPlaceholder: 'ID 末 3 碼', showCancelButton: true });
-        if (id) {
-            Swal.showLoading();
-            const res = await callGAS('quickAddAndSign', [currentAdminDate, id]);
-            Swal.fire(res.success ? '成功' : '失敗', res.msg, res.success ? 'success' : 'error');
-            if (res.success) loadAdminContent();
-        }
-    }
-
-    function openManagement() {
-        Swal.fire('提醒', '場次管理功能建議於電腦端 GAS 介面操作以獲得最佳體驗，或可進一步整合 module_admin 邏輯至此。', 'info');
-    }
-
-    // --- 預約詳情彈窗 (整合自 js_booking) ---
-    async function popDetail(idx) {
-        const e = evData[idx];
-        const isInfoOnly = !e.isOpen;
-        const fullList = [...e.extendedProps.mainList, ...e.extendedProps.waitList];
-        const tags = (list) => list.length ? list.map(p => `<span class="name-tag ${p.isSigned?'is-signed':''}">${p.name}</span>`).join('') : '無';
-
-        Swal.fire({
-            title: e.title,
-            width: '95%',
-            html: `
-                <div class="small">
-                    <div class="mb-3"><span class="badge bg-light text-dark border">${e.start}</span></div>
-                    ${isInfoOnly ? '<div class="alert alert-info">此場次僅供資訊發佈</div>' : `
-                        <div class="text-success fw-bold">🏆 正取 (${e.extendedProps.mainList.length})</div>
-                        <div class="mb-3">${tags(e.extendedProps.mainList)}</div>
-                        <div class="text-warning fw-bold">⌛ 候補 (${e.extendedProps.waitList.length})</div>
-                        <div class="mb-3">${tags(e.extendedProps.waitList)}</div>
-                        <hr>
-                        <div class="fw-bold mb-2">預約請輸入末3碼</div>
-                        <input id="regId" class="form-control mb-2 text-center" placeholder="ID 末 3 碼">
-                    `}
-                </div>`,
-            showConfirmButton: !isInfoOnly,
-            confirmButtonText: '確定預約',
-            showCancelButton: true,
-            cancelButtonText: '關閉'
-        }).then(async (r) => {
-            if (r.isConfirmed && !isInfoOnly) {
-                const id = document.getElementById('regId').value;
-                if (!id) return;
-                Swal.showLoading();
-                const res = await callGAS('processRegistration', [e.start, [id], 'REGISTER', []]);
-                Swal.fire('訊息', res.msg || res, 'info').then(() => {
-                    // 重新抓取資料並刷新
-                    callGAS('fetchInitialData').then(d => { evData = d.events; refreshColorsAndList(); });
-                });
-            }
-        });
     }
 </script>
 </body>
